@@ -1,0 +1,127 @@
+//#include <LiquidCrystal_I2C.h>
+//LiquidCrystal_I2C lcd(0x27,16,2);
+#include <Adafruit_LiquidCrystal.h>
+//int seconds = 0;
+Adafruit_LiquidCrystal lcd(0);
+
+#define trigpin 3  //Pin trigger sensor ultrasonik
+#define echopin 4 // pin echo sensor ultrasonik
+int ledlow = 5;  // Pin led RENDAH
+int ledmiddle = 6; // Pin LED SEDANG
+int ledhigh = 7; // PIN LED TINGGI
+int buzzer = 8; //PIN BUZZER
+int relaybahaya = 9; // PIN RELAY
+
+void setup()
+{
+Serial.begin(9600);
+lcd.begin(16, 2);
+
+//INISIALISASI PIN ARDUINO SEBAGAI INPUT/OUTPU
+
+pinMode(trigpin, OUTPUT);
+pinMode(echopin, INPUT);
+  pinMode(ledlow, OUTPUT); 
+  pinMode(ledmiddle, OUTPUT);
+  pinMode(ledhigh, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+  pinMode(relaybahaya, OUTPUT);
+
+  digitalWrite(ledlow, LOW); 
+  digitalWrite(ledmiddle, LOW);
+  digitalWrite(ledhigh, LOW);
+  digitalWrite(buzzer, LOW);
+  digitalWrite(relaybahaya, LOW);
+
+ delay(1000); 
+}
+
+void loop()
+{
+ int duration, distance;
+ digitalWrite(trigpin, HIGH);
+delayMicroseconds(1000);  
+digitalWrite(trigpin, LOW);
+duration = pulseIn(echopin,HIGH);
+distance = ( duration / 2) / 29.1;
+Serial.println("cm:"); 
+Serial.println(distance);
+
+lcd.setCursor(0,0);
+  lcd.print("Jarak = ");
+  lcd.print(distance);       //Menampilkan jarak pada LCD I2C 16x2
+  lcd.print(" cm");
+  
+
+if(  (distance > 0) && (distance <= 50)   ) //BATAS AMBANG
+{
+  digitalWrite(ledlow, LOW); 
+  digitalWrite(ledmiddle, LOW);
+  digitalWrite(ledhigh, LOW);
+  digitalWrite(buzzer, HIGH);
+  digitalWrite(relaybahaya, HIGH); 
+  lcd.setCursor(0,1);
+  lcd.print("Tangki Overload ");
+} else
+if(  (distance > 50) && (distance <= 100)  ) //LEVEL SANGAT TINGGI
+{
+
+  digitalWrite(ledlow, LOW); 
+  digitalWrite(ledmiddle, LOW);
+  digitalWrite(ledhigh, HIGH);
+  digitalWrite(buzzer, LOW);
+  digitalWrite(relaybahaya, LOW); 
+  lcd.setCursor(0,1);
+  lcd.print("Level High 100% ");
+
+} else
+
+if(  (distance > 100) && (distance <= 150)  ) // LEVEL TINGGI
+{
+
+  digitalWrite(ledlow, LOW); 
+  digitalWrite(ledmiddle, LOW);
+  digitalWrite(ledhigh, HIGH);
+  digitalWrite(buzzer, LOW);
+  digitalWrite(relaybahaya, LOW);
+  lcd.setCursor(0,1);
+  lcd.print("Level High 80% ");
+} else
+
+if(  (distance > 150) && (distance <= 200)  ) // LEVEL TENGAH
+{
+
+  digitalWrite(ledlow, LOW); 
+  digitalWrite(ledmiddle, HIGH);
+  digitalWrite(ledhigh, LOW);
+  digitalWrite(buzzer, LOW);
+  digitalWrite(relaybahaya, LOW);
+  lcd.setCursor(0,1);
+  lcd.print("Level Middle 60% ");
+} else
+
+if(  (distance > 200) && (distance <= 280)  ) //LEVEL RENDAH
+{
+
+  digitalWrite(ledlow, HIGH); 
+  digitalWrite(ledmiddle, LOW);
+  digitalWrite(ledhigh, LOW);
+  digitalWrite(buzzer, LOW);
+  digitalWrite(relaybahaya, LOW);
+  lcd.setCursor(0,1);
+  lcd.print("Level Low 40% ");
+} else
+
+if(  distance > 280 ) //LEVEL SANGAT RENDAH
+{
+
+  digitalWrite(ledlow, HIGH); 
+  digitalWrite(ledmiddle, LOW);
+  digitalWrite(ledhigh, LOW);
+  digitalWrite(buzzer, LOW);
+  digitalWrite(relaybahaya, LOW);
+  lcd.setCursor(0,1);
+  lcd.print("Level Low 20% ");
+} 
+delay(500);
+}
